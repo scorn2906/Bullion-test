@@ -124,11 +124,19 @@
     <div class="flex flex-col gap-4">
       <label for="" class="font-bold">Foto Profil</label>
       <div class="flex flex-col gap-1">
-        <FileInput />
-        <!-- <InputText name="photo" type="file" placeholder="Pilih foto profil" />
-        <Message v-if="$form.photo?.invalid" severity="error" size="small" variant="simple">{{
-          $form.photo.error?.message
-        }}</Message> -->
+        <FormField v-slot="$field" name="photo" :initialValue="initialValues.photo">
+          <FileInput
+            name="photo"
+            :file="$field.value"
+            @update:file="
+              (base64: string) => {
+                console.log('base64', base64)
+                $field.value = base64
+                console.log('bas$field.valuee64', $field.value)
+              }
+            "
+          />
+        </FormField>
       </div>
     </div>
     <Button type="submit" label="Tambah" severity="info" />
@@ -138,7 +146,7 @@
 <script setup lang="ts">
 import FileInput from '@/components/atoms/FileInput.vue'
 import type { ReqRegisterDTO } from '@/features/user/user.types'
-import { Form, type FormSubmitEvent } from '@primevue/forms'
+import { Form, FormField, type FormSubmitEvent } from '@primevue/forms'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import { Button, DatePicker, InputText, Message, Select } from 'primevue'
 import { ref } from 'vue'
@@ -175,7 +183,7 @@ const schema = z
     last_name: z.string().min(1, 'Last name is required'),
     phone: z.string({ message: 'Phone is required' }).min(8, 'Phone number is to short'),
     address: z.string().min(5, 'Address is required'),
-    photo: z.string(),
+    photo: z.string().nullable(),
   })
   .superRefine((val, ctx) => {
     if (val.password !== val.confirm_password) {
@@ -195,7 +203,18 @@ const emit = defineEmits<{
   (e: 'submit', values: ReqRegisterDTO): void
 }>()
 
-const initialValues = ref({
+const initialValues = ref<{
+  first_name: string
+  last_name: string
+  gender: string
+  date_of_birth: string
+  email: string
+  phone: string
+  address: string
+  photo: null | string
+  password: string
+  confirm_password: string
+}>({
   first_name: '',
   last_name: '',
   gender: '',
@@ -203,7 +222,7 @@ const initialValues = ref({
   email: '',
   phone: '',
   address: '',
-  photo: '',
+  photo: null,
   password: '',
   confirm_password: '',
 })
@@ -214,6 +233,8 @@ const listGender = [
 ]
 
 const onFormSubmit = (event: FormSubmitEvent) => {
-  if (event.valid) emit('submit', event.values as ReqRegisterDTO)
+  const payload = event.values
+  delete payload.confirm_password
+  if (event.valid) emit('submit', payload as ReqRegisterDTO)
 }
 </script>

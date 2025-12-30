@@ -14,9 +14,36 @@
 import RegisterForm from '@/components/organisms/form/RegisterForm.vue'
 import AuthSide from '@/components/templates/AuthSide.vue'
 import type { ReqRegisterDTO } from '@/features/user/user.types'
+import { useCreateUserMutation } from '@/features/user/useRegisterMutation'
+import axios from 'axios'
+import { useToast } from 'primevue'
+
+const registerMutation = useCreateUserMutation()
+const toast = useToast()
 
 const handleSubmit = async (val: ReqRegisterDTO) => {
-  console.log('val: ', val)
+  try {
+    const res = await registerMutation.mutateAsync(val)
+    if (res) {
+      toast.add({
+        severity: 'success',
+        summary: 'Create user success',
+        life: 300,
+      })
+    }
+  } catch (error) {
+    let errorMessage = 'Create user failed, please try again!'
+    if (axios.isAxiosError(error)) {
+      errorMessage =
+        error.response?.data.err_message ?? error.response?.data?.message ?? errorMessage
+    }
+    toast.add({
+      severity: 'error',
+      summary: 'Create User failed',
+      detail: errorMessage,
+      life: 3000,
+    })
+  }
 }
 </script>
 

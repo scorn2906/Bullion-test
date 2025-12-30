@@ -29,7 +29,7 @@ export interface ReqRegisterDTO {
   email: string
   phone: string
   address: string
-  // photo: '',
+  photo: string | null
   password: string
 }
 
