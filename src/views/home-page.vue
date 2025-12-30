@@ -68,9 +68,9 @@
           </div>
         </template>
       </Column>
-      <template #footer>
+      <!-- <template #footer>
         <p>Pagination</p>
-      </template>
+      </template> -->
     </DataTable>
   </main>
 </template>

@@ -130,9 +130,7 @@
             :file="$field.value"
             @update:file="
               (base64: string) => {
-                console.log('base64', base64)
                 $field.value = base64
-                console.log('bas$field.valuee64', $field.value)
               }
             "
           />

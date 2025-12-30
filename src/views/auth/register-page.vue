@@ -15,6 +15,7 @@ import RegisterForm from '@/components/organisms/form/RegisterForm.vue'
 import AuthSide from '@/components/templates/AuthSide.vue'
 import type { ReqRegisterDTO } from '@/features/user/user.types'
 import { useCreateUserMutation } from '@/features/user/useRegisterMutation'
+import { sha256 } from '@/libs/hash'
 import axios from 'axios'
 import { useToast } from 'primevue'
 
@@ -23,7 +24,8 @@ const toast = useToast()
 
 const handleSubmit = async (val: ReqRegisterDTO) => {
   try {
-    const res = await registerMutation.mutateAsync(val)
+    const hashPassword = await sha256(val.password)
+    const res = await registerMutation.mutateAsync({ ...val, password: hashPassword })
     if (res) {
       toast.add({
         severity: 'success',
